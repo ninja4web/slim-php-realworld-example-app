@@ -199,6 +199,14 @@ class ArticleController
             $article->slug = str_slug($params['title']);
         }
 
+        $tagsId = [];
+        if (isset($params['tagList'])) {
+            foreach ($params['tagList'] as $tag) {
+                $tagsId[] = Tag::updateOrCreate(['title' => $tag], ['title' => $tag])->id;
+            }
+            $article->tags()->sync($tagsId);
+        }
+
         $data = $this->fractal->createData(new Item($article, new ArticleTransformer()))->toArray();
 
         return $response->withJson(['article' => $data]);
